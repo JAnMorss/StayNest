@@ -7,20 +7,21 @@ import RegisterModal from "./components/modals/RegisterModal";
 
 export const metadata: Metadata = {
   title: "StayNest",
-  description: "Find and book unique vacation homes, apartments, and stays for your next trip with StayNest.",
+  description:
+    "Find and book unique vacation homes, apartments, and stays for your next trip with StayNest.",
 };
 
 const font = Nunito({
   subsets: ["latin"],
-})
+});
 
 export default function RootLayout({
-  children
-}: LayoutProps<"/">
-) {
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en"
-    >
+    <html lang="en">
       <body className={font.className}>
         <ClientOnly>
           <RegisterModal />
