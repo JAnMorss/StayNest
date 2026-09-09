@@ -1,51 +1,70 @@
 "use client";
 
-import axios from "axios";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
-import { useCallback, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import useRegisterModal from "@/app/hooks/useRegisterModal";
-import { error } from "console";
+import Input from "../inputs/Input";
 import Modal from "./Modal";
 import Heading from "../Heading";
-import Input from "../inputs/Input";
-import toast from "react-hot-toast";
 import Button from "../Button";
+import { registerSchema, type RegisterUserRequest } from "@/server/schemas/user";
+import { useRegisterUser } from "@/server/queries/users";
 
 type Props = {};
 
+type RegisterFormValues = RegisterUserRequest;
+
 export default function RegisterModal({}: Props) {
   const registerModal = useRegisterModal();
-  const [isLoading, setIsLoading] = useState(false);
+  const registerMutation = useRegisterUser();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FieldValues>({
+    setError,
+    clearErrors,
+  } = useForm<RegisterFormValues>({
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    setIsLoading(true);
+  const onSubmit: SubmitHandler<RegisterFormValues> = (data) => {
+    clearErrors();
 
-    axios
-      .post("/api/register", data)
-      .then(() => {
-        registerModal.onClose();
-      })
-      .catch((error) => {
-        toast.error("Something went wrong.")
-      })
-      .finally(() => {
-        setIsLoading(false);
+    const result = registerSchema.safeParse(data);
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+
+      Object.entries(fieldErrors).forEach(([field, messages]) => {
+        if (messages?.[0]) {
+          setError(field as keyof RegisterFormValues, {
+            type: "manual",
+            message: messages[0],
+          });
+        }
       });
+
+      return;
+    }
+
+    registerMutation.mutate(result.data, {
+      onSuccess: (response) => {
+        toast.success(response.message);
+        registerModal.onClose();
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    });
   };
 
   const bodyContent = (
@@ -56,17 +75,26 @@ export default function RegisterModal({}: Props) {
         center
       />
       <Input
-        id="email"
-        label="Email"
-        disabled={isLoading}
+        id="firstName"
+        label="First Name"
+        disabled={registerMutation.isPending}
         register={register}
         errors={errors}
         required
       />
       <Input
-        id="name"
-        label="Name"
-        disabled={isLoading}
+        id="lastName"
+        label="Last Name"
+        disabled={registerMutation.isPending}
+        register={register}
+        errors={errors}
+        required
+      />
+      <Input
+        id="email"
+        label="Email"
+        type="email"
+        disabled={registerMutation.isPending}
         register={register}
         errors={errors}
         required
@@ -74,7 +102,8 @@ export default function RegisterModal({}: Props) {
       <Input
         id="password"
         label="Password"
-        disabled={isLoading}
+        type="password"
+        disabled={registerMutation.isPending}
         register={register}
         errors={errors}
         required
@@ -126,10 +155,10 @@ export default function RegisterModal({}: Props) {
 
   return (
     <Modal
-      disabled={isLoading}
+      disabled={registerMutation.isPending}
       isOpen={registerModal.isOpen}
       title="Register"
-      actionLabel="Continue"
+      actionLabel={registerMutation.isPending ? "Creating..." : "Continue"}
       onClose={registerModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
