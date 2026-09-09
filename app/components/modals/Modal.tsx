@@ -81,6 +81,7 @@ export default function Modal({
           outline-none
           focus:outline-none
           bg-neutral-800/70
+          p-4
         "
       >
         <div
@@ -90,11 +91,10 @@ export default function Modal({
             md:w-4/6
             lg:w-3/6
             xl:w-2/5
-            my-6
+            my-auto
             mx-auto
-            h-full
-            lg:h-auto
-            md:h-auto
+            max-h-[90vh]
+            flex
           "
         >
           {/* CONTENT */}
@@ -102,7 +102,7 @@ export default function Modal({
             className={`
               translate
               duration-300
-              h-full
+              w-full
               ${showModal ? "translate-y-0" : "translate-y-full"}
               ${showModal ? "opacity-100" : "opacity-0"}
             `}
@@ -110,9 +110,6 @@ export default function Modal({
             <div
               className="
                 translate
-                h-full
-                lg:h-auto
-                md:h-auto
                 border-0
                 rounded-lg
                 shadow-lg
@@ -120,9 +117,11 @@ export default function Modal({
                 flex
                 flex-col
                 w-full
+                max-h-[90vh]
                 bg-white
                 outline-none
                 focus:outline-none
+                overflow-hidden
               "
             >
               {/* HEADER */}
@@ -136,6 +135,7 @@ export default function Modal({
                   relative
                   border-b
                   border-gray-200
+                  shrink-0
                 "
               >
                 <button
@@ -156,10 +156,10 @@ export default function Modal({
               </div>
               
               {/* BODY */}
-              <div className="relative p-6 flex-auto">{body}</div>
+              <div className="relative p-6 flex-auto overflow-y-auto">{body}</div>
 
               {/* FOOTER */}
-              <div className="flex flex-col gap-2 p-6">
+              <div className="flex flex-col gap-2 p-6 shrink-0">
                 <div
                   className="
                     flex
