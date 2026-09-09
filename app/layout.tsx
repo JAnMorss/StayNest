@@ -3,6 +3,7 @@ import "./globals.css";
 import { Nunito } from "next/font/google";
 import Navbar from "./components/navbar/Navbar";
 import ClientOnly from "./components/ClientOnly";
+import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import TanstackProvider from "./components/providers/tanstack-provider";
@@ -28,6 +29,7 @@ export default function RootLayout({
         <TanstackProvider>
           <ClientOnly>
             <ToasterProvider />
+            <LoginModal />
             <RegisterModal />
             <Navbar />
           </ClientOnly>
