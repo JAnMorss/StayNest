@@ -1,5 +1,8 @@
 import { apiClient } from "./client";
-import type { RegisterUserRequest } from "@/server/schemas/user";
+import type {
+  LoginUserRequest,
+  RegisterUserRequest,
+} from "@/server/schemas/user";
 
 export interface RegisterUserResponseData {
   id: string;
@@ -17,6 +20,15 @@ export interface RegisterUserResponse {
   message: string;
 }
 
+export interface LoginUserResponseData {
+  accessToken: string;
+}
+
+export interface LoginUserResponse {
+  data: LoginUserResponseData;
+  message: string;
+}
+
 export async function registerUser(
   payload: RegisterUserRequest,
 ): Promise<RegisterUserResponse> {
@@ -27,4 +39,13 @@ export async function registerUser(
       body: payload,
     },
   );
+}
+
+export async function loginUser(
+  payload: LoginUserRequest,
+): Promise<LoginUserResponse> {
+  return apiClient<LoginUserResponse, LoginUserRequest>("/api/v1/users/login", {
+    method: "POST",
+    body: payload,
+  });
 }
