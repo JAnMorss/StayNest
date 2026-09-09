@@ -1,19 +1,19 @@
 import React from "react";
-import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldErrors, FieldValues, Path, UseFormRegister } from "react-hook-form";
 import { BiDollar } from "react-icons/bi";
 
-type Props = {
-  id: string;
+type Props<TFieldValues extends FieldValues> = {
+  id: Path<TFieldValues>;
   label: string;
   type?: string;
   disabled?: boolean;
   formatPrice?: boolean;
   required?: boolean;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors;
+  register: UseFormRegister<TFieldValues>;
+  errors: FieldErrors<TFieldValues>;
 };
 
-export default function Input({
+export default function Input<TFieldValues extends FieldValues>({
   id,
   label,
   type,
@@ -22,7 +22,7 @@ export default function Input({
   required,
   register,
   errors,
-}: Props) {
+}: Props<TFieldValues>) {
   return (
     <div className="w-full relative">
       {formatPrice && (
