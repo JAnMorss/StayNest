@@ -7,9 +7,11 @@ import MenuItem from "./MenuItem";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 
-type Props = {}
+type UserMenuProps = {
+    currentUser?: any | null;
+}
 
-export default function UserMenu({}: Props) {
+export default function UserMenu({ currentUser }: UserMenuProps) {
     const loginModal = useLoginModal();
     const registerModal = useRegisterModal();
     const [isOpen, setIsOpen] = useState(false);
@@ -78,16 +80,53 @@ export default function UserMenu({}: Props) {
                     "
                 >
                     <div className="flex flex-col cursor-pointer">
-                        <>
-                            <MenuItem 
-                                onClick={loginModal.onOpen}
-                                label="Login"
-                            />
-                            <MenuItem 
-                                onClick={registerModal.onOpen}
-                                label="Sign up"
-                            />
-                        </>
+                        {
+                            currentUser ? (
+                                <>
+                                    <MenuItem 
+                                        onClick={() => {}}
+                                        label="My trips"
+                                    />
+
+                                    <MenuItem 
+                                        onClick={() => {}}
+                                        label="My favorites"
+                                    />
+
+                                    <MenuItem 
+                                        onClick={() => {}}
+                                        label="My reservations"
+                                    />
+
+                                    <MenuItem 
+                                        onClick={() => {}}
+                                        label="My properties"
+                                    />
+
+                                    <MenuItem 
+                                        onClick={() => {}}
+                                        label="My home"
+                                    />
+                                    <hr />
+                                     <MenuItem 
+                                        onClick={() => {}}
+                                        label="Logout"
+                                    />
+                                </>
+                            ) : (
+                        
+                                <>
+                                    <MenuItem 
+                                        onClick={loginModal.onOpen}
+                                        label="Login"
+                                    />
+                                    <MenuItem 
+                                        onClick={registerModal.onOpen}
+                                        label="Sign up"
+                                    />
+                                </>
+                            )
+                        }
                     </div>   
                 </div>
             )}
