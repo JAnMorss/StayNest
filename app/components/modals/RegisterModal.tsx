@@ -4,13 +4,12 @@ import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import Input from "../inputs/Input";
 import Modal from "./Modal";
 import Heading from "../Heading";
 import Button from "../Button";
-import { registerSchema, type RegisterUserRequest } from "@/server/schemas/user";
+import { registerSchema, type RegisterUserRequest } from "@/server/schemas/users";
 import { useRegisterUser } from "@/server/queries/users";
 
 type Props = {};
