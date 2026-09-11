@@ -5,9 +5,11 @@ import Logo from './Logo'
 import Search from './Search'
 import UserMenu from './UserMenu'
 
-type Props = {}
+type NavbarProps = {
+    currentUser?: any | null;
+}
 
-export default function Navbar({}: Props) {
+export default function Navbar({ currentUser }: NavbarProps) {
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
         <div 
@@ -30,7 +32,7 @@ export default function Navbar({}: Props) {
                 >
                     <Logo />
                     <Search />
-                    <UserMenu />
+                    <UserMenu currentUser={currentUser} />
                 </div>
             </Container>
         </div>
