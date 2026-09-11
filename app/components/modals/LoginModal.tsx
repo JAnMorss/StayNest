@@ -2,13 +2,15 @@
 
 import { type SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { useLoginUser } from "@/server/queries/users";
-import { loginSchema, type LoginUserRequest } from "@/server/schemas/user";
+import { loginSchema, type LoginUserRequest } from "@/server/schemas/users";
 import Input from "../inputs/Input";
 import Modal from "./Modal";
 import Heading from "../Heading";
+import Button from "../Button";
+import { FcGoogle } from "react-icons/fc";
+import { AiFillGithub } from "react-icons/ai";
 
 export default function LoginModal() {
   const loginModal = useLoginModal();
@@ -86,6 +88,48 @@ export default function LoginModal() {
     </div>
   );
 
+  const footerContent = (
+      <div className="flex flex-col gap-4 mt-3">
+        <hr className="border-gray-200" />
+        <Button
+          outline
+          label="Continue with Google"
+          icon={FcGoogle}
+          onClick={() => {}}
+        />
+        <Button
+          outline
+          label="Continue with Github"
+          icon={AiFillGithub}
+          onClick={() => {}}
+        />
+        <div
+          className="
+            text-neutral-500
+            text-center
+            mt-4
+            font-light
+          "
+        >
+          <div className="flex flex-row justify-center items-center gap-2">
+            <div>
+              Don't have an account?
+            </div>
+            <div
+              onClick={loginModal.onClose}
+              className="
+                text-neutral-800
+                cursor-pointer
+                hover:underline
+              "
+            >
+              Register
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
   return (
     <Modal
       disabled={loginMutation.isPending}
@@ -95,6 +139,7 @@ export default function LoginModal() {
       onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
+      footer={footerContent}
     />
   );
 }
