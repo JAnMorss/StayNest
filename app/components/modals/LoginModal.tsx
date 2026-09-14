@@ -1,20 +1,22 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import { useLoginUser } from "@/server/queries/users";
-import { loginSchema, type LoginUserRequest } from "@/server/schemas/users";
+import { loginSchema, type LoginUserRequest } from "@/server/schemas/users/user";
 import Input from "../inputs/Input";
 import Modal from "./Modal";
 import Heading from "../Heading";
 import Button from "../Button";
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
+import { useLoginUser } from "@/app/hooks/useUser";
 
 export default function LoginModal() {
   const loginModal = useLoginModal();
   const loginMutation = useLoginUser();
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -51,6 +53,8 @@ export default function LoginModal() {
 
     loginMutation.mutate(result.data, {
       onSuccess: (response) => {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        queryClient.invalidateQueries({ queryKey: ["current-user"] });
         toast.success(response.message);
         loginModal.onClose();
       },
