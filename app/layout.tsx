@@ -7,7 +7,6 @@ import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import TanstackProvider from "./components/providers/tanstack-provider";
-import { getCurrentUser } from "@/server/api/users";
 
 export const metadata: Metadata = {
   title: "StayNest",
@@ -19,13 +18,11 @@ const font = Nunito({
   subsets: ["latin"],
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const currentUser = await getCurrentUser().catch(() => null);
-
   return (
     <html lang="en">
       <body className={font.className}>
@@ -34,7 +31,7 @@ export default async function RootLayout({
             <ToasterProvider />
             <LoginModal />
             <RegisterModal />
-            <Navbar currentUser={currentUser} />
+            <Navbar />
           </ClientOnly>
           {children}
         </TanstackProvider>
