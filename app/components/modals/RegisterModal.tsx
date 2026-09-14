@@ -9,8 +9,8 @@ import Input from "../inputs/Input";
 import Modal from "./Modal";
 import Heading from "../Heading";
 import Button from "../Button";
-import { registerSchema, type RegisterUserRequest } from "@/server/schemas/users";
-import { useRegisterUser } from "@/server/queries/users";
+import { registerSchema, type RegisterUserRequest } from "@/server/schemas/users/user";
+import { useRegisterUser } from "@/app/hooks/useUser";
 
 type Props = {};
 
