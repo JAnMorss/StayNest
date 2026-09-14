@@ -38,6 +38,14 @@ async function parseResponse<TResponse>(response: Response): Promise<TResponse> 
   return text as TResponse;
 }
 
+function getStoredAccessToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem("accessToken");
+}
+
 export async function apiClient<TResponse, TBody = unknown>(
   path: string,
   options: ApiRequestOptions<TBody> = {},
@@ -49,11 +57,14 @@ export async function apiClient<TResponse, TBody = unknown>(
     credentials = "same-origin",
   } = options;
 
+  const accessToken = getStoredAccessToken();
+
   const response = await fetch(buildUrl(path), {
     method,
     headers: {
       Accept: "application/json",
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...headers,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
