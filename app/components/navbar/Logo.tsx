@@ -1,12 +1,10 @@
 'use client';
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 type Props = {}
 
 export default function Logo({}: Props) {
-    const router = useRouter();
 
     return (
         <Image
@@ -15,6 +13,7 @@ export default function Logo({}: Props) {
             height={100}
             width={100}
             src="/images/logo2.png"
+            loading="eager"
             style={{ width: "auto", height: "auto" }}
         />
     )
