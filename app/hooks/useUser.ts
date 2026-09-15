@@ -10,7 +10,6 @@ import {
   type LoginUserResponse,
   type RegisterUserResponse,
 } from "@/server/api/users/user";
-
 import type {
   LoginUserRequest,
   RegisterUserRequest,
