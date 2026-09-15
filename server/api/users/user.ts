@@ -1,10 +1,8 @@
 import { apiClient } from "../client";
-
 import type {
   LoginUserRequest,
   RegisterUserRequest,
 } from "@/server/schemas/users/user";
-
 import type {
   CurrentUserResponse,
   LoginUserResponse,
