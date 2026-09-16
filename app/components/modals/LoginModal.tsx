@@ -12,9 +12,13 @@ import Button from "../Button";
 import { FcGoogle } from "react-icons/fc";
 import { AiFillGithub } from "react-icons/ai";
 import { useLoginUser } from "@/app/hooks/useUser";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
+import { useCallback } from "react";
 
 export default function LoginModal() {
   const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
+
   const loginMutation = useLoginUser();
   const queryClient = useQueryClient();
 
@@ -64,6 +68,11 @@ export default function LoginModal() {
     });
   };
 
+  const toggle = useCallback(() => {
+    loginModal.onClose();
+    registerModal.onOpen();
+  }, [loginModal, registerModal]);
+
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading
@@ -101,12 +110,6 @@ export default function LoginModal() {
           icon={FcGoogle}
           onClick={() => {}}
         />
-        <Button
-          outline
-          label="Continue with Github"
-          icon={AiFillGithub}
-          onClick={() => {}}
-        />
         <div
           className="
             text-neutral-500
@@ -120,14 +123,14 @@ export default function LoginModal() {
               Don't have an account?
             </div>
             <div
-              onClick={loginModal.onClose}
+              onClick={toggle}
               className="
                 text-neutral-800
                 cursor-pointer
                 hover:underline
               "
             >
-              Register
+              Create an account
             </div>
           </div>
         </div>
