@@ -5,6 +5,7 @@ import Container from '../Container'
 import Logo from './Logo'
 import Search from './Search'
 import UserMenu from './UserMenu'
+import Categories from './Categories';
 
 export default function Navbar() {
   const { data: currentUser } = useCurrentUser();
@@ -35,6 +36,7 @@ export default function Navbar() {
                 </div>
             </Container>
         </div>
+        <Categories />
     </div>
   )
 }
