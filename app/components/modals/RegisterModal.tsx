@@ -11,6 +11,8 @@ import Heading from "../Heading";
 import Button from "../Button";
 import { registerSchema, type RegisterUserRequest } from "@/server/schemas/users/user";
 import { useRegisterUser } from "@/app/hooks/useUser";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import { useCallback } from "react";
 
 type Props = {};
 
@@ -18,6 +20,8 @@ type RegisterFormValues = RegisterUserRequest;
 
 export default function RegisterModal({}: Props) {
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
+  
   const registerMutation = useRegisterUser();
 
   const {
@@ -66,29 +70,40 @@ export default function RegisterModal({}: Props) {
     });
   };
 
+  const toggle = useCallback(() => {
+      registerModal.onClose();
+      loginModal.onOpen();
+    }, [registerModal, loginModal]);
+
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading 
+      <Heading
         title="Welcome to StayNest"
         subtitle="Create an account!"
         center
       />
-      <Input
-        id="firstName"
-        label="First Name"
-        disabled={registerMutation.isPending}
-        register={register}
-        errors={errors}
-        required
-      />
-      <Input
-        id="lastName"
-        label="Last Name"
-        disabled={registerMutation.isPending}
-        register={register}
-        errors={errors}
-        required
-      />
+
+      {/* First Name + Last Name */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Input
+          id="firstName"
+          label="First Name"
+          disabled={registerMutation.isPending}
+          register={register}
+          errors={errors}
+          required
+        />
+
+        <Input
+          id="lastName"
+          label="Last Name"
+          disabled={registerMutation.isPending}
+          register={register}
+          errors={errors}
+          required
+        />
+      </div>
+
       <Input
         id="email"
         label="Email"
@@ -98,6 +113,7 @@ export default function RegisterModal({}: Props) {
         errors={errors}
         required
       />
+
       <Input
         id="password"
         label="Password"
@@ -111,34 +127,22 @@ export default function RegisterModal({}: Props) {
   );
 
   const footerContent = (
-    <div className="flex flex-col gap-4 mt-3">
+    <div className="flex flex-col gap-4">
       <hr className="border-gray-200" />
+
       <Button
         outline
         label="Continue with Google"
         icon={FcGoogle}
         onClick={() => {}}
       />
-      <Button
-        outline
-        label="Continue with Github"
-        icon={AiFillGithub}
-        onClick={() => {}}
-      />
-      <div
-        className="
-          text-neutral-500
-          text-center
-          mt-4
-          font-light
-        "
-      >
+
+      <div className="text-neutral-500 text-center font-light">
         <div className="flex flex-row justify-center items-center gap-2">
-          <div>
-            Already have an account?
-          </div>
+          <div>Already have an account?</div>
+
           <div
-            onClick={registerModal.onClose}
+            onClick={toggle}
             className="
               text-neutral-800
               cursor-pointer
