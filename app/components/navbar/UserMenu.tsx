@@ -7,6 +7,7 @@ import MenuItem from "./MenuItem";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useLogoutUser } from "@/app/hooks/useUser";
+import useRentModal from "@/app/hooks/useRentModal";
 
 type UserMenuProps = {
   currentUser?: any | null;
@@ -15,8 +16,10 @@ type UserMenuProps = {
 export default function UserMenu({ currentUser }: UserMenuProps) {
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
-  const { mutate: logout } = useLogoutUser();
+  const rentModal = useRentModal();
+
   const [isOpen, setIsOpen] = useState(false);
+  const { mutate: logout } = useLogoutUser();
   
   const toggleOpen = useCallback(() => {
     setIsOpen((value) => !value);
@@ -30,10 +33,19 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
     });
   }, [logout]);
 
+  const onRent = useCallback(() => {
+    if (!currentUser) {
+      return loginModal.onOpen();
+    }
+
+    rentModal.onOpen();
+  }, [currentUser, loginModal, rentModal]);
+
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
         <div
+          onClick={onRent}
           className="
             hidden
             md:block
@@ -115,7 +127,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
                 />
 
                 <MenuItem
-                  onClick={() => {}}
+                  onClick={rentModal.onOpen}
                   label="My home"
                 />
 
