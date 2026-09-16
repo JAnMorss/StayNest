@@ -135,7 +135,6 @@ export default function Modal({
                   relative
                   border-b
                   border-gray-200
-                  shrink-0
                 "
               >
                 <button
@@ -156,7 +155,7 @@ export default function Modal({
               </div>
               
               {/* BODY */}
-              <div className="relative p-6 flex-auto overflow-y-auto">{body}</div>
+              <div className="relative p-6 flex-auto">{body}</div>
 
               {/* FOOTER */}
               <div className="flex flex-col gap-2 p-6 shrink-0">
