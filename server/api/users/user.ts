@@ -2,6 +2,7 @@ import { apiClient } from "../client";
 import type {
   LoginUserRequest,
   RegisterUserRequest,
+  UserImageUploadRequest,
 } from "@/server/schemas/users/user";
 import type {
   CurrentUserResponse,
@@ -46,4 +47,23 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
       method: "GET",
     },
   );
+}
+
+export async function getUserImage<TResponse = Blob>(): Promise<TResponse> {
+  return apiClient<TResponse>("/api/v1/users/image", {
+    method: "GET",
+    headers: { Accept: "image/*" },
+  });
+}
+
+export async function uploadUserImage<TResponse = unknown>(
+  payload: UserImageUploadRequest,
+): Promise<TResponse> {
+  const body = new FormData();
+  body.append("File", payload.File);
+
+  return apiClient<TResponse>("/api/v1/users/image", {
+    method: "PUT",
+    body,
+  });
 }
