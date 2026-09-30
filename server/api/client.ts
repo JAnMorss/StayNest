@@ -2,7 +2,7 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface ApiRequestOptions<TBody = unknown> {
   method?: HttpMethod;
-  body?: TBody;
+  body?: TBody | FormData;
   headers?: Record<string, string>;
   credentials?: RequestCredentials;
 }
@@ -34,6 +34,10 @@ async function parseResponse<TResponse>(response: Response): Promise<TResponse> 
     return (await response.json()) as TResponse;
   }
 
+  if (contentType?.startsWith("image/") || contentType?.includes("application/octet-stream")) {
+    return (await response.blob()) as TResponse;
+  }
+
   const text = await response.text();
   return text as TResponse;
 }
@@ -58,16 +62,17 @@ export async function apiClient<TResponse, TBody = unknown>(
   } = options;
 
   const accessToken = getStoredAccessToken();
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   const response = await fetch(buildUrl(path), {
     method,
     headers: {
       Accept: "application/json",
-      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(body !== undefined && !isFormData ? { "Content-Type": "application/json" } : {}),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...headers,
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
     credentials,
   });
 
