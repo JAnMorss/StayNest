@@ -13,8 +13,8 @@ export type CountrySelectValue= {
 }
 
 interface CountrySelectProps {
-    value?: CountrySelectValue;
-    onChange: (value: CountrySelectValue) => void;
+    value?: CountrySelectValue | null;
+    onChange: (value: CountrySelectValue | null) => void;
 }
 
 export default function CountrySelect({
@@ -30,8 +30,8 @@ export default function CountrySelect({
             isClearable
             options={getAll()}
             value={value}
-            onChange={(value) => onChange(value as CountrySelectValue)}
-            formatOptionLabel={(option: any) => (
+            onChange={(value) => onChange(value as CountrySelectValue | null)}
+            formatOptionLabel={(option: CountrySelectValue) => (
                 <div className="flex flex-row items-center gap-3">
                     <span
                         className="
