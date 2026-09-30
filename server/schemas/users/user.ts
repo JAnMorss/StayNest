@@ -12,6 +12,13 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const userImageUploadSchema = z.object({
+  File: z.custom<File>(
+    (value) => typeof File !== "undefined" && value instanceof File,
+    "An image file is required.",
+  ),
+});
+
 export const userProfileSchema = z.object({
   id: z.string(),
   firstName: z.string(),
@@ -30,5 +37,6 @@ export const currentUserResponseSchema = z.object({
 
 export type RegisterUserRequest = z.infer<typeof registerSchema>;
 export type LoginUserRequest = z.infer<typeof loginSchema>;
+export type UserImageUploadRequest = z.infer<typeof userImageUploadSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type CurrentUserResponse = z.infer<typeof currentUserResponseSchema>;
