@@ -35,7 +35,9 @@ export default function RootLayout({
             <RegisterModal />
             <Navbar />
           </ClientOnly>
-          {children}
+          <div className="pb-20 pt-28">
+            {children}
+          </div>
         </TanstackProvider>
       </body>
     </html>
