@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import useRentModal from "@/app/hooks/useRentModal";
 import Modal from "./Modal";
@@ -14,7 +14,9 @@ import toast from "react-hot-toast";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
-import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
+import CountrySelect, {
+  CountrySelectValue,
+} from "../inputs/CountrySelect";
 import dynamic from "next/dynamic";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
@@ -66,7 +68,9 @@ enum STEPS {
   PRICE = 5,
 }
 
-const Map = dynamic(() => import("../Map"), { ssr: false });
+const Map = dynamic(() => import("../Map"), {
+  ssr: false,
+});
 
 export default function RentModal() {
   const rentModal = useRentModal();
@@ -74,9 +78,8 @@ export default function RentModal() {
 
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pendingListingId, setPendingListingId] = useState<string | null>(
-    null
-  );
+  const [pendingListingId, setPendingListingId] =
+    useState<string | null>(null);
 
   const {
     register,
@@ -195,9 +198,13 @@ export default function RentModal() {
   };
 
   const onNext = async () => {
-    if (await trigger(stepFields[step])) {
-      setStep((value) => value + 1);
+    const isValid = await trigger(stepFields[step]);
+
+    if (!isValid) {
+      return;
     }
+
+    setStep((value) => value + 1);
   };
 
   const closeAfterSuccess = () => {
@@ -247,7 +254,7 @@ export default function RentModal() {
         });
       }
 
-      toast.success("Your listing has been created.");
+      toast.success("Your listing has been Created.");
 
       router.refresh();
 
@@ -261,6 +268,15 @@ export default function RentModal() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onModalSubmit = async () => {
+    if (step === STEPS.PRICE) {
+      await handleSubmit(submitListing)();
+      return;
+    }
+
+    await onNext();
   };
 
   const actionLabel =
@@ -480,13 +496,7 @@ export default function RentModal() {
     <Modal
       isOpen={rentModal.isOpen}
       onClose={rentModal.onClose}
-      onSubmit={
-        step === STEPS.PRICE
-          ? () => {
-              void handleSubmit(submitListing)();
-            }
-          : onNext
-      }
+      onSubmit={onModalSubmit}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={
