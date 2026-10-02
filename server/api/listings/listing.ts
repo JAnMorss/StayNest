@@ -57,11 +57,15 @@ export async function deleteListing<TResponse = unknown>(id: string): Promise<TR
 }
 
 export async function getMyListing<TResponse = unknown>(id: string): Promise<TResponse> {
-  return apiClient<TResponse>(`/api/v1/listing/my/${encodeURIComponent(id)}`);
+  return apiClient<TResponse>(`/api/v1/listing/my/${encodeURIComponent(id)}`, {
+    auth: false,
+  });
 }
 
 export async function getListingImages<TResponse = unknown>(id: string): Promise<TResponse> {
-  return apiClient<TResponse>(`/api/v1/listing/${encodeURIComponent(id)}/image`);
+  return apiClient<TResponse>(`/api/v1/listing/${encodeURIComponent(id)}/image`, {
+    auth: false,
+  });
 }
 
 export async function uploadListingImages<TResponse = unknown>(
