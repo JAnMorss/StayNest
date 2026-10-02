@@ -5,6 +5,7 @@ export interface ApiRequestOptions<TBody = unknown> {
   body?: TBody | FormData;
   headers?: Record<string, string>;
   credentials?: RequestCredentials;
+  auth?: boolean;
 }
 
 export class ApiError extends Error {
@@ -59,9 +60,10 @@ export async function apiClient<TResponse, TBody = unknown>(
     body,
     headers = {},
     credentials = "same-origin",
+    auth = true,
   } = options;
 
-  const accessToken = getStoredAccessToken();
+  const accessToken = auth ? getStoredAccessToken() : null;
   const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   const response = await fetch(buildUrl(path), {
