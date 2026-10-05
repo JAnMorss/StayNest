@@ -46,7 +46,16 @@ export function useCurrentUser() {
         return null;
       }
 
-      return getCurrentUser();
+      try {
+        return await getCurrentUser();
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          window.localStorage.removeItem("accessToken");
+          return null;
+        }
+
+        throw error;
+      }
     },
   });
 }
@@ -63,6 +72,7 @@ export function useLogoutUser() {
 
     onSuccess: () => {
       queryClient.setQueryData(["current-user"], null);
+      queryClient.setQueryData<string[]>(["favorite-listings"], []);
     },
   });
 }
