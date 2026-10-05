@@ -83,7 +83,10 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
           <AiOutlineMenu />
 
           <div>
-            <Avatar src={currentUser?.image} />
+            <Avatar
+              src={currentUser?.data?.image}
+              isAuthenticated={Boolean(currentUser)}
+            />
           </div>
         </div>
       </div>
