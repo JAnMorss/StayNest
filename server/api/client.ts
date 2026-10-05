@@ -23,6 +23,22 @@ export class ApiError extends Error {
 const DEFAULT_API_URL = "http://localhost:8010";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_URL;
 
+export function resolveAssetUrl(value: unknown): string | undefined {
+  if (typeof value !== "string" || value.length === 0) {
+    return undefined;
+  }
+
+  try {
+    const url = new URL(value);
+    if (url.hostname === "staynest-blob-storage") {
+      url.hostname = new URL(API_BASE_URL).hostname;
+    }
+    return url.toString();
+  } catch {
+    return value;
+  }
+}
+
 function buildUrl(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${API_BASE_URL.replace(/\/$/, "")}${normalizedPath}`;
