@@ -341,7 +341,13 @@ export default function RentModal() {
           title="Where is your place located?"
           subtitle="Help guests find you!"
         />
-
+        
+        {errors.location && (
+          <p className="text-sm text-rose-500">
+            {errors.location.message}
+          </p>
+        )}
+        
         <CountrySelect
           value={location ?? undefined}
           onChange={(value) =>
@@ -351,11 +357,6 @@ export default function RentModal() {
 
         <Map center={location?.latlng} />
 
-        {errors.location && (
-          <p className="text-sm text-rose-500">
-            {errors.location.message}
-          </p>
-        )}
       </div>
     );
   }
