@@ -12,9 +12,7 @@ type AvatarProps = {
 
 export default function Avatar({ src, isAuthenticated = false }: AvatarProps) {
   const defaultImage = "/images/appuser.jpg";
-  const fallbackImage = isAuthenticated
-    ? resolveAssetUrl(src) ?? defaultImage
-    : defaultImage;
+  const fallbackImage = resolveAssetUrl(src) ?? defaultImage;
   const [imageSrc, setImageSrc] = useState(fallbackImage);
 
   useEffect(() => {
