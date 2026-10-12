@@ -3,18 +3,99 @@
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
+import ListingReservation from "@/app/components/listings/ListingReservation";
 import { categories } from "@/app/components/navbar/Categories";
+import useLoginModal from "@/app/hooks/useLoginModal";
 import { resolveAssetUrl } from "@/server/api/client";
 import { Listing } from "@/server/types/listings/listing";
-import { useMemo } from "react";
+import { eachDayOfInterval, differenceInCalendarDays } from "date-fns";
+import { Range } from "react-date-range";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import { reserveListing } from "@/server/api/listings/listing";
+import { useCurrentUser } from "@/app/hooks/useUser";
+
+const initialDateRange: Range = {
+  startDate: new Date(),
+  endDate: new Date(),
+  key: "selection",
+}
 
 type ListingClientProps = {
+  reservations?: NonNullable<Listing["reservations"]>;
   listing: Listing;
 };
 
 export default function ListingClient({
+  reservations = [],
   listing,
 }: ListingClientProps) {
+  const loginModal = useLoginModal();
+  const router = useRouter();
+  const { data: currentUser, isLoading: isUserLoading } = useCurrentUser();
+
+  const disabledDates = useMemo(() => {
+    return reservations.flatMap((reservation) => {
+      const start = new Date(reservation.startDate);
+      const end = new Date(reservation.endDate);
+
+      if (
+        Number.isNaN(start.getTime()) ||
+        Number.isNaN(end.getTime()) ||
+        end < start
+      ) {
+        return [];
+      }
+
+      return eachDayOfInterval({ start, end });
+    });
+  }, [reservations]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dateRange, setDateRange] = useState<Range>(initialDateRange);
+  const price = listing.price ?? 0;
+  const nights =
+    dateRange.startDate && dateRange.endDate
+      ? Math.max(0, differenceInCalendarDays(dateRange.endDate, dateRange.startDate))
+      : 0;
+  const totalPrice = price * nights;
+
+  const onCreateReservation = useCallback(async () => {
+    if (!currentUser) {
+      loginModal.onOpen();
+      return;
+    }
+
+    const { startDate, endDate } = dateRange;
+    if (!startDate || !endDate || endDate <= startDate) {
+      toast.error("Choose a valid check-in and check-out date.");
+      return;
+    }
+
+    if (listing.price == null) {
+      toast.error("This listing does not have a valid price.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await reserveListing(listing.id, {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      });
+      toast.success("Your reservation has been created.");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to create reservation.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [currentUser, dateRange, listing.id, listing.price, loginModal, router]);
+
   const listingImages: (string | null | undefined)[] =
     Array.isArray(listing.imageUrls) &&
     listing.imageUrls.length > 0
@@ -69,6 +150,24 @@ export default function ListingClient({
               bathroomCount={listing.bathroomCount}
               locationValue={locationValue}
             />
+            <div
+              className="
+                order-first
+                mb-10
+                md:order-last
+                md:col-span-3
+              "
+            >
+              <ListingReservation
+                price={price}
+                totalPrice={totalPrice}
+                onChangeDate={setDateRange}
+                dateRange={dateRange}
+                onSubmit={onCreateReservation}
+                disabled={isSubmitting || isUserLoading || listing.price == null}
+                disabledDates={disabledDates}
+              />
+            </div>
           </div>
 
         </div>
