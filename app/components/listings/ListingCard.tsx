@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import HeartButton from '../HeartButton';
 import { resolveAssetUrl } from '@/server/api/client';
 import Button from '../Button';
+import { fromReservationDate } from '@/app/utils/reservationDates';
 
 type ListingCardProps = {
     data: any;
@@ -53,8 +54,8 @@ export default function ListingCard({
         return null;
     }
 
-    const start = new Date(reservation.startDate);
-    const end = new Date(reservation.endDate);
+    const start = fromReservationDate(reservation.startDate);
+    const end = fromReservationDate(reservation.endDate);
 
     return `${format(start, 'PP')} - ${format(end, 'PP')}`;
     }, [reservation]);
