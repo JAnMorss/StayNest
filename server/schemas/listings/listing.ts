@@ -59,6 +59,16 @@ export const listingPageResponseSchema = z.object({
   message: z.string(),
 });
 
+export const reservationPageResponseSchema = z.object({
+  data: z.object({
+    items: z.array(listingReservationSchema),
+    totalCount: z.number().int(),
+    page: z.number().int(),
+    pageSize: z.number().int(),
+  }),
+  message: z.string(),
+});
+
 export const listingQuerySchema = z.object({
   SortBy: z.string().optional(),
   Descending: z.boolean().optional(),
@@ -89,6 +99,7 @@ export const reserveRequestSchema = z.object({
 export type ListingRequest = z.infer<typeof listingRequestSchema>;
 export type ListingResponse = z.infer<typeof listingResponseSchema>;
 export type ListingPageResponse = z.infer<typeof listingPageResponseSchema>;
+export type ReservationPageResponse = z.infer<typeof reservationPageResponseSchema>;
 export type ListingQuery = z.infer<typeof listingQuerySchema>;
 export type ListingImageUploadRequest = z.infer<typeof listingImageUploadSchema>;
 export type ReserveRequest = z.infer<typeof reserveRequestSchema>;
