@@ -44,9 +44,9 @@ export default async function ListingDetailsPage({
 
   return (
     <ClientOnly>
-        <ListingClient 
-            listing={listing} 
-            reservations={listing.reservations}
+        <ListingClient
+          listing={listing}
+          reservations={listing.reservations}
         />
     </ClientOnly>
   );
