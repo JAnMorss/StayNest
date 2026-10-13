@@ -1,1 +1,4 @@
-export type { ListingResponse as Listing } from "@/server/schemas/listings/listing";
+export type {
+  ListingResponse as Listing,
+  ReservationPageResponse,
+} from "@/server/schemas/listings/listing";
