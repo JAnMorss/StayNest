@@ -15,6 +15,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { reserveListing } from "@/server/api/listings/listing";
 import { useCurrentUser } from "@/app/hooks/useUser";
+import {
+  fromReservationDate,
+  toReservationDateISOString,
+} from "@/app/utils/reservationDates";
 
 const initialDateRange: Range = {
   startDate: new Date(),
@@ -37,8 +41,8 @@ export default function ListingClient({
 
   const disabledDates = useMemo(() => {
     return reservations.flatMap((reservation) => {
-      const start = new Date(reservation.startDate);
-      const end = new Date(reservation.endDate);
+      const start = fromReservationDate(reservation.startDate);
+      const end = fromReservationDate(reservation.endDate);
 
       if (
         Number.isNaN(start.getTime()) ||
@@ -82,8 +86,8 @@ export default function ListingClient({
 
     try {
       await reserveListing(listing.id, {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: toReservationDateISOString(startDate),
+        endDate: toReservationDateISOString(endDate),
       });
       toast.success("Your reservation has been created.");
       router.refresh();
