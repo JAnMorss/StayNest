@@ -4,6 +4,7 @@ import {
   type ListingImageUploadRequest,
   type ListingQuery,
   type ListingRequest,
+  type ReservationPageResponse,
   type ReserveRequest,
   reserveRequestSchema,
 } from "@/server/schemas/listings/listing";
@@ -140,6 +141,10 @@ export async function reserveListing<TResponse = unknown>(
       body: parsed.data,
     },
   );
+}
+
+export async function getReservations<TResponse = ReservationPageResponse>(): Promise<TResponse> {
+  return apiClient<TResponse>("/api/v1/listing/reservations");
 }
 
 export async function cancelListingReservation<TResponse = unknown>(
