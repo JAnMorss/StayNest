@@ -21,7 +21,7 @@ export default function Avatar({ src, isAuthenticated = false }: AvatarProps) {
 
     setImageSrc(fallbackImage);
 
-    if (isAuthenticated) {
+    if (isAuthenticated && src) {
       getUserImage<Blob>()
         .then((image) => {
           if (!(image instanceof Blob) || image.size === 0) {
@@ -46,7 +46,7 @@ export default function Avatar({ src, isAuthenticated = false }: AvatarProps) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [fallbackImage, isAuthenticated]);
+  }, [fallbackImage, isAuthenticated, src]);
 
   return (
     <Image
