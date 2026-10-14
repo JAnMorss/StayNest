@@ -8,12 +8,14 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import { useLogoutUser } from "@/app/hooks/useUser";
 import useRentModal from "@/app/hooks/useRentModal";
+import { useRouter } from "next/navigation";
 
 type UserMenuProps = {
   currentUser?: any | null;
 };
 
 export default function UserMenu({ currentUser }: UserMenuProps) {
+  const router = useRouter();
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
   const rentModal = useRentModal();
@@ -110,7 +112,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
             {currentUser ? (
               <>
                 <MenuItem
-                  onClick={() => {}}
+                  onClick={() => router.push("/trips")}
                   label="My trips"
                 />
 
