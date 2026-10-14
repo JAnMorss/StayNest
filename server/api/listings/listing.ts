@@ -1,13 +1,20 @@
 import { apiClient } from "../client";
 import {
   listingImageUploadSchema,
+  listingResponseSchema,
   type ListingImageUploadRequest,
   type ListingQuery,
   type ListingRequest,
+  type ListingResponse,
   type ReservationPageResponse,
   type ReserveRequest,
+  reservationPageResponseSchema,
   reserveRequestSchema,
 } from "@/server/schemas/listings/listing";
+
+export type Trip = ReservationPageResponse["data"]["items"][number] & {
+  listing: ListingResponse;
+};
 
 function withQuery(path: string, query: ListingQuery): string {
   const searchParams = new URLSearchParams();
@@ -124,6 +131,11 @@ export async function removeListingFromFavorites<TResponse = unknown>(
   );
 }
 
+export async function getReservations(): Promise<ReservationPageResponse> {
+  const response = await apiClient<unknown>("/api/v1/listing/reservations");
+  return reservationPageResponseSchema.parse(response);
+}
+
 export async function reserveListing<TResponse = unknown>(
   id: string,
   payload: ReserveRequest,
@@ -143,15 +155,47 @@ export async function reserveListing<TResponse = unknown>(
   );
 }
 
-export async function getReservations<TResponse = ReservationPageResponse>(): Promise<TResponse> {
-  return apiClient<TResponse>("/api/v1/listing/reservations");
-}
-
 export async function cancelListingReservation<TResponse = unknown>(
-  id: string,
+  reservationId: string,
 ): Promise<TResponse> {
   return apiClient<TResponse>(
-    `/api/v1/listing/${encodeURIComponent(id)}/cancel-reservation`,
-    { method: "POST" },
+    `/api/v1/listing/reservations/${encodeURIComponent(reservationId)}`,
+    { method: "DELETE" },
+  );
+}
+
+function unwrapListing(payload: unknown): ListingResponse | undefined {
+  const parsed = listingResponseSchema.safeParse(payload);
+  if (parsed.success) return parsed.data;
+
+  if (typeof payload === "object" && payload !== null) {
+    for (const key of ["data", "listing", "item", "result"]) {
+      const nested = (payload as Record<string, unknown>)[key];
+      if (nested !== undefined) {
+        const listing = unwrapListing(nested);
+        if (listing) return listing;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+export async function getTrips(): Promise<Trip[]> {
+  const { data } = await getReservations();
+
+  return Promise.all(
+    data.items.map(async (reservation): Promise<Trip> => {
+      const payload = await getListing<unknown>(reservation.listingId);
+      const listing = unwrapListing(payload);
+
+      if (!listing) {
+        throw new Error(
+          `Listing ${reservation.listingId} response did not match the listing schema.`,
+        );
+      }
+
+      return { ...reservation, listing };
+    }),
   );
 }
