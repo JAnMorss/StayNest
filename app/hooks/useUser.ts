@@ -6,14 +6,7 @@ import {
   getCurrentUser,
   loginUser,
   registerUser,
-  type CurrentUserResponse,
-  type LoginUserResponse,
-  type RegisterUserResponse,
 } from "@/server/api/users/user";
-import type {
-  LoginUserRequest,
-  RegisterUserRequest,
-} from "@/server/schemas/users/user";
 
 function getStoredAccessToken() {
   if (typeof window === "undefined") {
@@ -24,19 +17,19 @@ function getStoredAccessToken() {
 }
 
 export function useRegisterUser() {
-  return useMutation<RegisterUserResponse, ApiError, RegisterUserRequest>({
+  return useMutation({
     mutationFn: registerUser,
   });
 }
 
 export function useLoginUser() {
-  return useMutation<LoginUserResponse, ApiError, LoginUserRequest>({
+  return useMutation({
     mutationFn: loginUser,
   });
 }
 
 export function useCurrentUser() {
-  return useQuery<CurrentUserResponse | null, ApiError>({
+  return useQuery({
     queryKey: ["current-user"],
 
     queryFn: async () => {
