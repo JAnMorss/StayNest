@@ -1,52 +1,55 @@
 import { apiClient } from "../client";
-import type {
-  LoginUserRequest,
-  RegisterUserRequest,
-  UserImageUploadRequest,
+import {
+  currentUserResponseSchema,
+  loginUserResponseSchema,
+  registerUserResponseSchema,
 } from "@/server/schemas/users/user";
 import type {
   CurrentUserResponse,
+  LoginUserRequest,
   LoginUserResponse,
+  RegisterUserRequest,
   RegisterUserResponse,
-} from "@/server/types/users/user";
-
-export type {
-  CurrentUserResponse,
-  LoginUserResponse,
-  RegisterUserResponse,
-} from "@/server/types/users/user";
+  UserImageUploadRequest,
+} from "@/server/schemas/users/user";
 
 export async function registerUser(
   payload: RegisterUserRequest,
 ): Promise<RegisterUserResponse> {
-  return apiClient<RegisterUserResponse, RegisterUserRequest>(
+  const response = await apiClient<unknown, RegisterUserRequest>(
     "/api/v1/users/register",
     {
       method: "POST",
       body: payload,
     },
   );
+
+  return registerUserResponseSchema.parse(response);
 }
 
 export async function loginUser(
   payload: LoginUserRequest,
 ): Promise<LoginUserResponse> {
-  return apiClient<LoginUserResponse, LoginUserRequest>(
+  const response = await apiClient<unknown, LoginUserRequest>(
     "/api/v1/users/login",
     {
       method: "POST",
       body: payload,
     },
   );
+
+  return loginUserResponseSchema.parse(response);
 }
 
 export async function getCurrentUser(): Promise<CurrentUserResponse> {
-  return apiClient<CurrentUserResponse>(
+  const response = await apiClient<unknown>(
     "/api/v1/users/me",
     {
       method: "GET",
     },
   );
+
+  return currentUserResponseSchema.parse(response);
 }
 
 export async function getUserImage<TResponse = Blob>(): Promise<TResponse> {
