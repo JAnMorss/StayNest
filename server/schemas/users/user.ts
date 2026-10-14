@@ -35,8 +35,19 @@ export const currentUserResponseSchema = z.object({
   message: z.string(),
 });
 
+export const registerUserResponseSchema = currentUserResponseSchema;
+
+export const loginUserResponseSchema = z.object({
+  data: z.object({
+    accessToken: z.string(),
+  }),
+  message: z.string(),
+});
+
 export type RegisterUserRequest = z.infer<typeof registerSchema>;
 export type LoginUserRequest = z.infer<typeof loginSchema>;
 export type UserImageUploadRequest = z.infer<typeof userImageUploadSchema>;
 export type UserProfile = z.infer<typeof userProfileSchema>;
 export type CurrentUserResponse = z.infer<typeof currentUserResponseSchema>;
+export type RegisterUserResponse = z.infer<typeof registerUserResponseSchema>;
+export type LoginUserResponse = z.infer<typeof loginUserResponseSchema>;
