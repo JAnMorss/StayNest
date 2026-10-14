@@ -16,6 +16,46 @@ export const listingFavoriteSchema = z.object({
   listingId: z.string(),
 });
 
+const favoriteListingIdSchema = z
+  .union([
+    z.string(),
+    z.object({ listingId: z.string() }),
+    z.object({ id: z.string() }),
+  ])
+  .transform((favorite) =>
+    typeof favorite === "string"
+      ? favorite
+      : "listingId" in favorite
+        ? favorite.listingId
+        : favorite.id,
+  );
+
+export const favoriteListingsResponseSchema: z.ZodType<string[]> = z.lazy(() =>
+  z.union([
+    z.array(favoriteListingIdSchema),
+    z
+      .object({
+        favoriteIds: favoriteListingsResponseSchema.optional(),
+        favorites: favoriteListingsResponseSchema.optional(),
+        listings: favoriteListingsResponseSchema.optional(),
+        data: favoriteListingsResponseSchema.optional(),
+      })
+      .transform((response) => {
+        const nested =
+          response.favoriteIds ??
+          response.favorites ??
+          response.listings ??
+          response.data;
+
+        if (nested === undefined) {
+          throw new Error("Favorite listings response did not contain listing IDs.");
+        }
+
+        return nested;
+      }),
+  ]),
+);
+
 export const listingReservationSchema = z.object({
   id: z.string(),
   userId: z.string(),
