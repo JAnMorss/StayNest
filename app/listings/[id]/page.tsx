@@ -2,17 +2,16 @@ import { getListing } from "@/server/api/listings/listing";
 import ClientOnly from "@/app/components/ClientOnly";
 import EmptyState from "@/app/components/EmptyState";
 import ListingClient from "./ListingClient";
-import { Listing } from "@/server/types/listings/listing";
+import type { ListingResponse } from "@/server/schemas/listings/listing";
 
-
-function unwrapListing(payload: unknown): Listing | null {
+function unwrapListing(payload: unknown): ListingResponse | null {
   if (typeof payload !== "object" || payload === null) {
     return null;
   }
 
   const record = payload as Record<string, unknown>;
   if (typeof record.id === "string") {
-    return record as Listing;
+    return record as ListingResponse;
   }
 
   for (const key of ["data", "listing", "item", "result"]) {
