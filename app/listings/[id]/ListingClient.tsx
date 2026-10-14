@@ -7,7 +7,7 @@ import ListingReservation from "@/app/components/listings/ListingReservation";
 import { categories } from "@/app/components/navbar/Categories";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import { resolveAssetUrl } from "@/server/api/client";
-import { Listing } from "@/server/types/listings/listing";
+import type { ListingResponse } from "@/server/schemas/listings/listing";
 import { eachDayOfInterval, differenceInCalendarDays } from "date-fns";
 import { Range } from "react-date-range";
 import toast from "react-hot-toast";
@@ -27,8 +27,8 @@ const initialDateRange: Range = {
 }
 
 type ListingClientProps = {
-  reservations?: NonNullable<Listing["reservations"]>;
-  listing: Listing;
+  reservations?: NonNullable<ListingResponse["reservations"]>;
+  listing: ListingResponse;
 };
 
 export default function ListingClient({
