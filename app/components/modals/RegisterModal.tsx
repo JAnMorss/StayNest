@@ -63,6 +63,7 @@ export default function RegisterModal({}: Props) {
       onSuccess: (response) => {
         toast.success(response.message);
         registerModal.onClose();
+        loginModal.onOpen();
       },
       onError: (error) => {
         toast.error(error.message);
