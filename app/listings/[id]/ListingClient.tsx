@@ -71,6 +71,14 @@ export default function ListingClient({
       return;
     }
 
+    if (
+      listing.userId === currentUser.data.id ||
+      listing.createdBy === currentUser.data.id
+    ) {
+      toast.error("You can't reserve your own property.");
+      return;
+    }
+
     const { startDate, endDate } = dateRange;
     if (!startDate || !endDate || endDate <= startDate) {
       toast.error("Choose a valid check-in and check-out date.");
@@ -89,8 +97,10 @@ export default function ListingClient({
         startDate: toReservationDateISOString(startDate),
         endDate: toReservationDateISOString(endDate),
       });
+      
       toast.success("Your reservation has been created.");
-      router.refresh();
+      setDateRange(initialDateRange);
+      router.push('/trips');
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Unable to create reservation.",
@@ -98,7 +108,16 @@ export default function ListingClient({
     } finally {
       setIsSubmitting(false);
     }
-  }, [currentUser, dateRange, listing.id, listing.price, loginModal, router]);
+  }, [
+    currentUser,
+    dateRange,
+    listing.createdBy,
+    listing.id,
+    listing.price,
+    listing.userId,
+    loginModal,
+    router,
+  ]);
 
   const listingImages: (string | null | undefined)[] =
     Array.isArray(listing.imageUrls) &&
