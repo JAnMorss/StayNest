@@ -61,7 +61,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
             cursor-pointer
           "
         >
-          Airbnb your home
+          StayNest your home
         </div>
 
         <div
@@ -117,12 +117,12 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
                 />
 
                 <MenuItem
-                  onClick={() => {}}
+                  onClick={() =>  router.push("/favorites")}
                   label="My favorites"
                 />
 
                 <MenuItem
-                  onClick={() => {}}
+                  onClick={() => router.push("/reservations")}
                   label="My reservations"
                 />
 
@@ -133,7 +133,7 @@ export default function UserMenu({ currentUser }: UserMenuProps) {
 
                 <MenuItem
                   onClick={rentModal.onOpen}
-                  label="My home"
+                  label="StayNest my home"
                 />
 
                 <hr />
