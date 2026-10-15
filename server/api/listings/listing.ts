@@ -1,6 +1,7 @@
 import { apiClient } from "../client";
 import {
   listingImageUploadSchema,
+  listingPageResponseSchema,
   listingResponseSchema,
   type ListingImageUploadRequest,
   type ListingQuery,
@@ -15,6 +16,8 @@ import {
 export type Trip = ReservationPageResponse["data"]["items"][number] & {
   listing: ListingResponse;
 };
+
+export type HostReservation = Trip;
 
 function withQuery(path: string, query: ListingQuery): string {
   const searchParams = new URLSearchParams();
@@ -134,6 +137,43 @@ export async function removeListingFromFavorites<TResponse = unknown>(
 export async function getReservations(): Promise<ReservationPageResponse> {
   const response = await apiClient<unknown>("/api/v1/listing/reservations");
   return reservationPageResponseSchema.parse(response);
+}
+
+export async function getHostReservations(userId: string): Promise<HostReservation[]> {
+  const pageSize = 100;
+  const reservations: HostReservation[] = [];
+  let page = 1;
+
+  while (true) {
+    const response = await listListings<unknown>({ Page: page, PageSize: pageSize });
+    const { data } = listingPageResponseSchema.parse(response);
+
+    for (const listing of data.items) {
+      if (listing.userId !== userId && listing.createdBy !== userId) {
+        continue;
+      }
+
+      for (const reservation of listing.reservations ?? []) {
+        reservations.push({ ...reservation, listing });
+      }
+    }
+
+    if (data.items.length === 0) {
+      break;
+    }
+
+    if (data.pageSize <= 0) {
+      throw new Error("Listing response page size must be greater than zero.");
+    }
+
+    if (page >= Math.ceil(data.totalCount / data.pageSize)) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return reservations;
 }
 
 export async function reserveListing<TResponse = unknown>(
