@@ -44,6 +44,7 @@ export default function TripsClient() {
       />
     );
   }
+  
   if (trips.data.length === 0) {
     return (
       <EmptyState
