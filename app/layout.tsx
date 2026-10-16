@@ -8,6 +8,7 @@ import RegisterModal from "./components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import TanstackProvider from "./components/providers/tanstack-provider";
 import RentModal from "./components/modals/RentModal";
+import SearchModal from "./components/modals/SearchModal";
 
 export const metadata: Metadata = {
   title: "StayNest",
@@ -30,6 +31,7 @@ export default function RootLayout({
         <TanstackProvider>
           <ClientOnly>
             <ToasterProvider />
+            <SearchModal />
             <RentModal />
             <LoginModal />
             <RegisterModal />
