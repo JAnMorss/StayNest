@@ -176,6 +176,41 @@ export async function getHostReservations(userId: string): Promise<HostReservati
   return reservations;
 }
 
+export async function getMyProperties(userId: string): Promise<ListingResponse[]> {
+  const pageSize = 100;
+  const properties: ListingResponse[] = [];
+  let page = 1;
+
+  while (true) {
+    const response = await listListings<unknown>({ Page: page, PageSize: pageSize });
+    const { data } = listingPageResponseSchema.parse(response);
+
+    for (const listing of data.items) {
+      if (listing.userId !== userId && listing.createdBy !== userId) {
+        continue;
+      }
+
+      properties.push(listing);
+    }
+
+    if (data.items.length === 0) {
+      break;
+    }
+
+    if (data.pageSize <= 0) {
+      throw new Error("Listing response page size must be greater than zero.");
+    }
+
+    if (page >= Math.ceil(data.totalCount / data.pageSize)) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return properties;
+}
+
 export async function reserveListing<TResponse = unknown>(
   id: string,
   payload: ReserveRequest,
