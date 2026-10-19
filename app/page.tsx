@@ -3,15 +3,16 @@ import ClientOnly from "./components/ClientOnly";
 import Container from "./components/Container";
 import EmptyState from "./components/EmptyState";
 import ListingCard from "./components/listings/ListingCard";
+import {
+  listingResponseSchema,
+  type ListingResponse,
+} from "@/server/schemas/listings/listing";
 
-type ListingData = {
-  id: string;
-  [key: string]: unknown;
-};
+type SearchParams = Record<string, string | string[] | undefined>;
 
-function getListings(response: unknown): ListingData[] {
+function getListings(response: unknown): ListingResponse[] {
   if (Array.isArray(response)) {
-    return response as ListingData[];
+    return response.map((listing) => listingResponseSchema.parse(listing));
   }
 
   if (typeof response !== "object" || response === null) {
@@ -29,9 +30,120 @@ function getListings(response: unknown): ListingData[] {
   return [];
 }
 
-export default async function Home() {
+function getSingleValue(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function getPositiveInteger(value: string | undefined): number | undefined {
+  if (!value || !/^\d+$/.test(value)) {
+    return undefined;
+  }
+
+  const parsedValue = Number(value);
+  return Number.isSafeInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : undefined;
+}
+
+function getDateOnly(value: string | undefined): string | undefined {
+  if (!value || !/^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : value.slice(0, 10);
+}
+
+function hasDateConflict(
+  reservations: ListingResponse["reservations"],
+  startDate: string,
+  endDate: string,
+): boolean {
+  return reservations?.some((reservation) => {
+    const status = reservation.status.toLowerCase();
+
+    if (/cancel|reject|declin/.test(status)) {
+      return false;
+    }
+
+    const bookedStart = getDateOnly(reservation.startDate);
+    const bookedEnd = getDateOnly(reservation.endDate);
+
+    return Boolean(
+      bookedStart &&
+        bookedEnd &&
+        bookedStart < endDate &&
+        bookedEnd > startDate,
+    );
+  }) ?? false;
+}
+
+function filterListings(
+  listings: ListingResponse[],
+  params: SearchParams,
+): ListingResponse[] {
+  const category = getSingleValue(params.category)?.trim().toLowerCase();
+  const locationValue = getSingleValue(params.locationValue)?.toLowerCase();
+  const guestCount = getPositiveInteger(getSingleValue(params.guestCount));
+  const roomCount = getPositiveInteger(getSingleValue(params.roomCount));
+  const bathroomCount = getPositiveInteger(getSingleValue(params.bathroomCount));
+  const startDate = getDateOnly(getSingleValue(params.startDate));
+  const endDate = getDateOnly(getSingleValue(params.endDate));
+
+  return listings.filter((listing) => {
+    if (
+      category &&
+      (typeof listing.category !== "string" ||
+        listing.category.trim().toLowerCase() !== category)
+    ) {
+      return false;
+    }
+
+    const listingLocation = listing.locationValue ?? listing.location;
+
+    if (
+      locationValue &&
+      (typeof listingLocation !== "string" ||
+        listingLocation.toLowerCase() !== locationValue)
+    ) {
+      return false;
+    }
+
+    if (
+      (guestCount !== undefined &&
+        (typeof listing.guestCount !== "number" ||
+          listing.guestCount < guestCount)) ||
+      (roomCount !== undefined &&
+        (typeof listing.roomCount !== "number" ||
+          listing.roomCount < roomCount)) ||
+      (bathroomCount !== undefined &&
+        (typeof listing.bathroomCount !== "number" ||
+          listing.bathroomCount < bathroomCount))
+    ) {
+      return false;
+    }
+
+    if (
+      startDate &&
+      endDate &&
+      endDate > startDate &&
+      hasDateConflict(listing.reservations, startDate, endDate)
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
   const response = await listListings<unknown>();
-  const listings = getListings(response);
+  const listings = filterListings(getListings(response), params);
 
   if (listings.length === 0) {
     return (
@@ -55,7 +167,7 @@ export default async function Home() {
           2xl:grid-cols-6
           gap-8
         ">
-          {listings.map((listing: any) => {
+          {listings.map((listing) => {
             return (
               <ListingCard
                 key={listing.id}
